@@ -1,0 +1,14 @@
+src/
+├── index.tsx                 # React entry point
+├── App.tsx                   # Root component
+├── components/               # Reusable UI components
+│   └── Button.tsx
+├── pages/                    # Page-level components (routing targets)
+│   ├── Home.tsx
+│   └── Settings.tsx
+├── hooks/                    # Custom hooks (useIPC, etc.)
+├── context/                  # Context providers (theme, user session)
+├── styles/                   # Global styles or Tailwind setup
+├── assets/                   # Images, fonts
+├── utils/                    # Shared helpers (validation, constants)
+└── ipc/                      # IPC wrapper (frontend side)

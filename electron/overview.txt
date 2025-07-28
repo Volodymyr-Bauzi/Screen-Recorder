@@ -1,0 +1,9 @@
+electron/
+├── main.ts (or main.js)      # Electron entry file (creates BrowserWindow)
+├── preload.ts                # Preload script (securely exposes APIs to renderer)
+├── ipc/                      # IPC channel handlers
+│   ├── index.ts
+│   └── user.ts
+├── utils/                    # Utility functions (native OS, logging)
+├── menu/                     # Custom menus/tray logic
+└── services/                 # Backend services (filesystem, DB, etc.)
