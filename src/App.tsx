@@ -3,12 +3,14 @@ import {StatusNotification} from './components/StatusNotification';
 import React from 'react';
 
 export function App() {
-  const mediaRecorderRef = useRef(null);
-  const streamRef = useRef(null);
-  const chunksRef = useRef([]);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
   const [isCapturing, setCapturing] = useState(false);
   const [bufferSeconds, setBufferSeconds] = useState(300);
-  const [recordings, setRecordings] = useState([]);
+  const [recordings, setRecordings] = useState<{name: string; path: string}[]>(
+    []
+  );
   const [status, setStatus] = useState('');
 
   /** Load existing recordings & register IPC listeners */
@@ -19,14 +21,14 @@ export function App() {
     const saveReplayHandler = async () => {
       if (!isCapturing) return;
       setStatus('Saving…');
-      const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+      const blob = new Blob(chunksRef.current, {type: 'video/webm'});
       const buffer = await blob.arrayBuffer();
       window.electronAPI.saveBuffer(buffer);
     };
     window.electronAPI.onSaveReplay(saveReplayHandler);
 
     // Listen save completion
-    window.electronAPI.onSaveComplete(({ success, message }: any) => {
+    window.electronAPI.onSaveComplete(({success, message}: any) => {
       if (success) {
         setStatus('Saved ✔');
         loadRecordings();
@@ -36,13 +38,16 @@ export function App() {
     });
 
     return () => {
+      window.electronAPI.removeSaveReplay?.(saveReplayHandler);
       // Ideally remove listeners, ipcRenderer.removeListener etc.
     };
   }, [isCapturing]);
 
   /** Fetch files list from backend */
   function loadRecordings() {
-    window.electronAPI.listRecordings().then((files: any) => setRecordings(files));
+    window.electronAPI
+      .listRecordings()
+      .then((files: any) => setRecordings(files));
   }
 
   /** Start screen capture */
@@ -61,7 +66,7 @@ export function App() {
       mediaRecorder.ondataavailable = (e: BlobEvent) => {
         chunksRef.current.push(e.data);
         // Trim chunks to stay within bufferSeconds
-        const maxChunks = Math.ceil(bufferSeconds * 1000 / CHUNK_MS);
+        const maxChunks = Math.ceil((bufferSeconds * 1000) / CHUNK_MS);
         if (chunksRef.current.length > maxChunks) {
           chunksRef.current.splice(0, chunksRef.current.length - maxChunks);
         }
