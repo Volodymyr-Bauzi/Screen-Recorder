@@ -1,8 +1,28 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const {contextBridge, ipcRenderer} = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  onSaveReplay: (cb) => ipcRenderer.on('save-replay', cb),
-  saveBuffer: (arrayBuffer) => ipcRenderer.send('save-buffer', arrayBuffer),
-  onSaveComplete: (cb) => ipcRenderer.on('save-buffer-complete', (e, args) => cb(args)),
+  startRecording: async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            minWidth: 1280,
+            maxWidth: 1280,
+            minHeight: 720,
+            maxHeight: 720,
+          },
+        },
+      });
+      return stream;
+    } catch (e) {
+      console.error('Screen capture error:', e);
+      throw e;
+    }
+  },
+  saveBuffer: (buffer) => ipcRenderer.send('save-buffer', buffer),
+  onSaveComplete: (callback) =>
+    ipcRenderer.on('save-buffer-complete', callback),
   listRecordings: () => ipcRenderer.invoke('list-recordings'),
 });

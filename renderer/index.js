@@ -7,18 +7,25 @@ function App() {
   const [isCapturing, setCapturing] = useState(false);
   const [bufferSeconds, setBufferSeconds] = useState(300);
   const [recordings, setRecordings] = useState([]);
+  const [status, setStatus] = useState('');
 
   useEffect(() => {
     loadRecordings();
     window.electronAPI.onSaveReplay(async () => {
       if (!isCapturing) return;
+      setStatus('Saving…');
       const blob = new Blob(chunksRef.current, { type: 'video/webm' });
       const arrayBuffer = await blob.arrayBuffer();
       window.electronAPI.saveBuffer(arrayBuffer);
     });
 
-    window.electronAPI.onSaveComplete(({ success }) => {
-      if (success) loadRecordings();
+    window.electronAPI.onSaveComplete(({ success, filePath, message }) => {
+      if (success) {
+        setStatus('Saved ✔');
+        loadRecordings();
+      } else {
+        setStatus('Error: ' + (message || 'Unknown'));
+      }
     });
   }, [isCapturing]);
 
@@ -44,8 +51,10 @@ function App() {
 
       mediaRecorder.start(1000); // collect in 1s chunks
       setCapturing(true);
+      setStatus('Recording started');
     } catch (err) {
       console.error(err);
+      setStatus('Error: ' + err.message);
     }
   }
 
@@ -53,6 +62,7 @@ function App() {
     mediaRecorderRef.current?.stop();
     streamRef.current?.getTracks().forEach((t) => t.stop());
     setCapturing(false);
+    setStatus('Recording stopped');
   }
 
   function playRecording(path) {
@@ -92,6 +102,25 @@ function App() {
           </div>
         ))}
       </div>
+
+      {status && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 10,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: '#333',
+            color: '#fff',
+            padding: '8px 12px',
+            borderRadius: '4px',
+            boxShadow: '0 0 6px rgba(0,0,0,0.3)',
+            zIndex: 1000,
+          }}
+        >
+          {status}
+        </div>
+      )}
     </>
   );
 }
