@@ -17,10 +17,6 @@ function createWindow() {
     height: 800,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: false,
-      contextIsolation: true,
-      webSecurity: true,
-      additionalArguments: ['--enable-features=WebRTCPipeWireCapturer'], // For Linux
       media: {
         permission: true,
       },
