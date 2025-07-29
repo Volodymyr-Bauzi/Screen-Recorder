@@ -2,7 +2,7 @@
   "name": "screen-recorder",
   "version": "0.1.0",
   "description": "Electron + React screen recorder with instant replay functionality",
-  "main": "main.js",
+  "main": "./electron/main.js",
   "scripts": {
     "start": "electron ."
   },

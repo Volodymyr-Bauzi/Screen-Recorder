@@ -1,8 +1,8 @@
 import {useEffect, useRef, useState} from 'react';
 import {StatusNotification} from './components/StatusNotification';
-import React from 'react';
 
-export function App() {
+function App() {
+  console.log('App component loaded');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -143,3 +143,5 @@ export function App() {
     </>
   );
 }
+
+export default App;

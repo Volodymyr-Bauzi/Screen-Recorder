@@ -48,6 +48,7 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, '..', 'index.html'));
 
+  console.log('PATH:', path.join(__dirname, '..', 'index.html'));
   return win;
 }
 
